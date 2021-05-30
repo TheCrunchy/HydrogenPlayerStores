@@ -16,6 +16,7 @@ using Torch.Mod.Messages;
 using VRage.Game.Entity;
 using Torch.Mod;
 using Sandbox.Game.Entities.Character;
+using Sandbox.Game.Entities.Cube;
 
 namespace HydrogenPlayerStores
 {
@@ -108,6 +109,8 @@ namespace HydrogenPlayerStores
                     ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                     return false;
                 }
+                MyBeacon beacon = new MyBeacon();
+         
                 MyCubeGrid grid = __instance.CubeGrid;
                 MyIdentity identity = MySession.Static.Players.TryGetIdentity(playerAccountInfo.OwnerIdentifier);
                 double amountToUse = amount * 1000;
@@ -132,6 +135,7 @@ namespace HydrogenPlayerStores
 
                 foreach (IMyGasTank tank in playerTanks)
                 {
+                    
                     if (amountToUse > 0)
                     {
                         MyGasTank tank2 = tank as MyGasTank;
@@ -178,8 +182,8 @@ namespace HydrogenPlayerStores
                         {
                         //    Log.Info("Taking 2");
                             double newAmount = num - gasToRemove;
-                            tank.ChangeFillRatioAmount(tank.FilledRatio - (newAmount / tank.Capacity));
-                            gasToRemove -= newAmount;
+                            tank.ChangeFillRatioAmount(newAmount / tank.Capacity);
+                            gasToRemove = 0;
                         }
                     }
 
