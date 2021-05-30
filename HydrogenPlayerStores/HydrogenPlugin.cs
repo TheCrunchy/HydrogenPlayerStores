@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Torch;
 using Torch.API;
+using Torch.Mod;
+using Torch.Mod.Messages;
 using VRage.Game;
 using VRage.Game.ModAPI.Ingame;
 using VRageMath;
@@ -47,6 +49,10 @@ namespace HydrogenPlayerStores
         public static Dictionary<long, DateTime> cooldowns = new Dictionary<long, DateTime>();
         public static MyDefinitionId gasDefinition = MyDefinitionId.FromContent(gas);
 
+
+        //i should throw all this shit into an object but i dont feel like it
+        public static Dictionary<long, long> PlayersBuyingGas = new Dictionary<long, long>();
+        public static Dictionary<long, long> temp = new Dictionary<long, long>();
         public object MyApiGateway { get; private set; }
         public int ticks = 0;
         public override void Update()
@@ -103,6 +109,7 @@ namespace HydrogenPlayerStores
                             tanks.Add(temp);
                         }
                         double amountToUse = 15000;
+                        List<long> IdsNotified = new List<long>();
                         foreach (IMyGasTank gasTank in tanks)
                         {
                             if (gasTank.OwnerId == hydrogen.Key && gasTank.CubeGrid.EntityId == hydrogen.Value)
@@ -116,6 +123,23 @@ namespace HydrogenPlayerStores
                             }
                             else
                             {
+                                if (!PlayersBuyingGas.ContainsKey(gasTank.OwnerId) && !IdsNotified.Contains(gasTank.OwnerId)){
+                                    NotificationMessage message = new NotificationMessage("Set tanks to stockpile and use !hydrogen buy", 4000, "Blue");
+                                    NotificationMessage message2 = new NotificationMessage("It costs " + String.Format("{0:n0}", Price) + " SC per 1000L", 4000, "Blue");
+                                    IdsNotified.Add(gasTank.OwnerId);
+                                    if (temp.ContainsKey(gasTank.OwnerId))
+                                    {
+                                        temp[gasTank.OwnerId] = hydrogen.Key;
+                                    }
+                                    else
+                                    {
+                                        temp.Add(gasTank.OwnerId, hydrogen.Key);
+                                    }
+                                    //this is annoying, need to figure out how to check the exact world time so a duplicate message isnt possible
+                                    ModCommunication.SendMessageTo(message, MySession.Static.Players.TryGetSteamId(gasTank.OwnerId));
+                                    ModCommunication.SendMessageTo(message2, MySession.Static.Players.TryGetSteamId(gasTank.OwnerId));
+                                    continue;
+                                }
                                 if (!gasTank.Stockpile)
                                     continue;
 
@@ -124,7 +148,13 @@ namespace HydrogenPlayerStores
                         }
                         foreach (IMyGasTank gasTank in playerTanks)
                         {
-                        //    MyStorePatch.Log.Info("1");
+                            //    MyStorePatch.Log.Info("1");
+                            if (!PlayersBuyingGas.ContainsKey(gasTank.OwnerId))
+                                continue;
+
+                            if (PlayersBuyingGas[gasTank.OwnerId] != hydrogen.Key)
+                                continue;
+
                             MyGasTank tankk = gasTank as MyGasTank;
                             amountToUse = tankk.Capacity * 0.1;
 

@@ -78,11 +78,14 @@ namespace HydrogenPlayerStores
             }
      
         }
-        [Command("stop", "stop selling hydrogen")]
+        [Command("stop", "stop selling or buying hydrogen")]
         [Permission(MyPromoteLevel.None)]
         public void StopHydrogen()
         {
-
+            if (HydrogenPlugin.PlayersBuyingGas.ContainsKey(Context.Player.IdentityId)){
+                HydrogenPlugin.PlayersBuyingGas.Remove(Context.Player.IdentityId);
+                Context.Respond("No longer buying hydrogen");
+            }
             if (HydrogenPlugin.GridsSellingHydrogen.ContainsKey(Context.Player.IdentityId))
             {
                 HydrogenPlugin.GridsSellingHydrogen.Remove(Context.Player.IdentityId);
@@ -93,6 +96,22 @@ namespace HydrogenPlayerStores
             else
             {
                 Context.Respond("You need to be selling hydrogen to stop.");
+            }
+
+        }
+
+        [Command("buy", "buy hydrogen from a nearby vendor")]
+        [Permission(MyPromoteLevel.None)]
+        public void BuyHydrogen()
+        {
+            if (HydrogenPlugin.temp.ContainsKey(Context.Player.IdentityId))
+            {
+                HydrogenPlugin.PlayersBuyingGas.Add(Context.Player.IdentityId, HydrogenPlugin.temp[Context.Player.IdentityId]);
+                Context.Respond("Now buying hydrogen");
+            }
+            else
+            {
+                Context.Respond("You are not near a player selling hydrogen.");
             }
 
         }
