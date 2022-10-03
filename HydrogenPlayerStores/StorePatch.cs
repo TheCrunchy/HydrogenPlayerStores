@@ -162,7 +162,13 @@ namespace HydrogenPlayerStores
                 ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                 return false;
             }
-
+     
+            if (__instance.OwnerId == player.Identity.IdentityId)
+            {
+                var m1 = new DialogMessage("Shop Error", "You cannot buy hydrogen from yourself!");
+                ModCommunication.SendMessageTo(m1, player.Id.SteamId);
+                return false;
+            }
             var grid = __instance.CubeGrid;
             var identity = MySession.Static.Players.TryGetIdentity(playerAccountInfo.OwnerIdentifier);
             float amountToUse = amount * 1000;
