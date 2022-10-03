@@ -191,8 +191,8 @@ namespace HydrogenPlayerStores
             TankHelper.RemoveGasFromTanksInGroup(storeTanks, amountToUse);
             price = BasePrice;
 
-            EconUtils.takeMoney(__instance.OwnerId, price);
-            EconUtils.addMoney(player.Identity.IdentityId, price);
+            EconUtils.takeMoney(player.Identity.IdentityId, price); 
+            EconUtils.addMoney(__instance.OwnerId, price);
             var m = new DialogMessage("Shop", $"Tanks filled. {BasePrice * 1000}L");
             ModCommunication.SendMessageTo(m, player.Id.SteamId);
             return false;

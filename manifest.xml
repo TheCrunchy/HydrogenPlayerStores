@@ -2,5 +2,5 @@
 <PluginManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name>HydrogenStores</Name>
   <Guid>28475fc8-0837-40b4-9ea8-8e3fd83d71f0</Guid>
-  <Version>v1.4</Version>
+  <Version>v1.5</Version>
 </PluginManifest>
