@@ -64,12 +64,17 @@ namespace HydrogenPlayerStores.Helper
             return GasRemoved;
         }
 
-        public static TankGroup MakeTankGroup(List<IMyGasTank> tanks, long ownerId)
+        public static TankGroup MakeTankGroup(List<IMyGasTank> tanks, long ownerId, long ignoredId)
         {
             var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = "Hydrogen" };
             var group = new TankGroup();
+
             foreach (var tank in tanks)
             {
+                if (tank.OwnerId == ignoredId)
+                {
+                    continue;
+                }
                 var relation = tank.GetUserRelationToOwner(ownerId);
                 if (!tank.Enabled) continue;
 

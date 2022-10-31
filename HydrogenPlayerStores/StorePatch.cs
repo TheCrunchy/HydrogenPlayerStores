@@ -79,14 +79,15 @@ namespace HydrogenPlayerStores
             var test = __instance.CubeGrid.GetGridGroup(GridLinkTypeEnum.Physical);
             var grids = new List<IMyCubeGrid>();
             var tanks = new List<IMyGasTank>();
+
             test.GetGrids(grids);
             foreach (var gridInGroup in grids)
             {
                tanks.AddRange(gridInGroup.GetFatBlocks<IMyGasTank>());
             }
 
-            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId);
-            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId);
+            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId);
+            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId);
             if (playerTanks.GasInTanks == 0)
             {
                 var m1 = new DialogMessage("Shop Error", "You do not have any gas to sell in non-stockpile tanks!");
@@ -119,6 +120,7 @@ namespace HydrogenPlayerStores
             var m = new DialogMessage("Shop", $"Sold some Hydrogen. {BasePrice * 1000}L");
             ModCommunication.SendMessageTo(m, player.Id.SteamId);
 
+            storeItem.Amount -= Convert.ToInt32(amountToUse / 1000);
             return false;
         }
 
@@ -149,8 +151,8 @@ namespace HydrogenPlayerStores
             {
                 tanks.AddRange(gridInGroup.GetFatBlocks<IMyGasTank>());
             }
-            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId);
-            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId);
+            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId);
+            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId);
 
             float totalGas = storeTanks.GasInTanks;
             var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = "Hydrogen" };
@@ -195,6 +197,7 @@ namespace HydrogenPlayerStores
             EconUtils.addMoney(__instance.OwnerId, price);
             var m = new DialogMessage("Shop", $"Tanks filled. {BasePrice * 1000}L");
             ModCommunication.SendMessageTo(m, player.Id.SteamId);
+            storeItem.Amount -= Convert.ToInt32(amountToUse / 1000);
             return false;
         }
 
