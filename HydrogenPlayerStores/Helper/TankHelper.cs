@@ -66,33 +66,47 @@ namespace HydrogenPlayerStores.Helper
 
         public static TankGroup MakeTankGroup(List<IMyGasTank> tanks, long ownerId, long ignoredId, string gasType)
         {
-            var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = gasType };
             var group = new TankGroup();
-
-            foreach (var tank in tanks)
+            try
             {
-                if (tank.OwnerId == ignoredId)
+               
+                var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = gasType };
+                var gasId = MyDefinitionId.FromContent(gas);
+                if (gasId == null)
                 {
-                    continue;
+                    return group;
                 }
-                var relation = tank.GetUserRelationToOwner(ownerId);
-                if (!tank.Enabled) continue;
 
-                if (tank.OwnerId != ownerId && relation != MyRelationsBetweenPlayerAndBlock.FactionShare &&
-                    relation != MyRelationsBetweenPlayerAndBlock.Neutral) continue;
-                if (tank.Stockpile)
+                foreach (var tank in tanks)
                 {
-                    continue;
+                    if (tank.OwnerId == ignoredId)
+                    {
+                        continue;
+                    }
+                    var relation = tank.GetUserRelationToOwner(ownerId);
+                    if (!tank.Enabled) continue;
+
+                    if (tank.OwnerId != ownerId && relation != MyRelationsBetweenPlayerAndBlock.FactionShare &&
+                        relation != MyRelationsBetweenPlayerAndBlock.Neutral) continue;
+                    if (tank.Stockpile)
+                    {
+                        continue;
+                    }
+                    group.TanksInGroup.Add(tank);
+                    var tankk = tank as MyGasTank;
+                    if (tankk.BlockDefinition.StoredGasId != gasId) continue;
+                    if (tankk.FilledRatio > 0)
+                    {
+                        group.GasInTanks += (float)(tankk.FilledRatio) * tankk.GasCapacity;
+                    }
+                    group.Capacity += (float)(1.0 - tankk.FilledRatio) * tankk.GasCapacity;
                 }
-                group.TanksInGroup.Add(tank);
-                var tankk = tank as MyGasTank;
-                if (tankk.BlockDefinition.StoredGasId != MyDefinitionId.FromContent(gas)) continue;
-                if (tankk.FilledRatio > 0)
-                {
-                    group.GasInTanks += (float)(tankk.FilledRatio) * tankk.GasCapacity;
-                }
-                group.Capacity += (float)(1.0 - tankk.FilledRatio) * tankk.GasCapacity;
             }
+            catch (Exception)
+            {
+                return group;
+            }
+
             return group;
         }
     }
