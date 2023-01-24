@@ -59,7 +59,7 @@ namespace HydrogenPlayerStores
             }
             var isItem = false;
 
-            if (storeItem.Item.Value.SubtypeName.Contains("HydrogenCredit"))
+            if (storeItem.Item.Value.SubtypeName.Contains("HydrogenCredit") || storeItem.Item.Value.SubtypeName.Contains("OxygenCredit") || storeItem.Item.Value.SubtypeName.Contains("PlasmaCredit"))
             {
                 isItem = true;
             }
@@ -68,10 +68,11 @@ namespace HydrogenPlayerStores
                 return true;
             }
 
+            var gas = storeItem.Item.Value.SubtypeName.Replace("Credit", "");
             var identity = MySession.Static.Players.TryGetIdentity(__instance.OwnerId);
             if (identity.IdentityId == player.Identity.IdentityId)
             {
-                var m1 = new DialogMessage("Shop Error", "You cannot sell hydrogen to yourself!");
+                var m1 = new DialogMessage("Shop Error", $"You cannot sell {gas} to yourself!");
                 ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                 return false;
             }
@@ -86,11 +87,11 @@ namespace HydrogenPlayerStores
                tanks.AddRange(gridInGroup.GetFatBlocks<IMyGasTank>());
             }
 
-            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId);
-            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId);
+            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId, gas);
+            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId, gas);
             if (playerTanks.GasInTanks == 0)
             {
-                var m1 = new DialogMessage("Shop Error", "You do not have any gas to sell in non-stockpile tanks!");
+                var m1 = new DialogMessage("Shop Error", $"You do not have any {gas} to sell in non-stockpile tanks!");
                 ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                 return false;
             }
@@ -117,7 +118,7 @@ namespace HydrogenPlayerStores
             
             EconUtils.takeMoney(__instance.OwnerId, price);
             EconUtils.addMoney(player.Identity.IdentityId, price);
-            var m = new DialogMessage("Shop", $"Sold some Hydrogen. {BasePrice * 1000}L");
+            var m = new DialogMessage("Shop", $"Sold some {gas}. {BasePrice * 1000}L");
             ModCommunication.SendMessageTo(m, player.Id.SteamId);
 
             storeItem.Amount -= Convert.ToInt32(amountToUse / 1000);
@@ -134,7 +135,7 @@ namespace HydrogenPlayerStores
             }
             var isItem = false;
 
-            if (storeItem.Item.Value.SubtypeName.Contains("HydrogenCredit"))
+            if (storeItem.Item.Value.SubtypeName.Contains("HydrogenCredit") || storeItem.Item.Value.SubtypeName.Contains("OxygenCredit") || storeItem.Item.Value.SubtypeName.Contains("PlasmaCredit"))
             {
                 isItem = true;
             }
@@ -142,6 +143,8 @@ namespace HydrogenPlayerStores
             {
                 return true;
             }
+
+            var gas = storeItem.Item.Value.SubtypeName.Replace("Credit", "");
 
             var test = __instance.CubeGrid.GetGridGroup(GridLinkTypeEnum.Physical);
             var grids = new List<IMyCubeGrid>();
@@ -151,23 +154,22 @@ namespace HydrogenPlayerStores
             {
                 tanks.AddRange(gridInGroup.GetFatBlocks<IMyGasTank>());
             }
-            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId);
-            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId);
+            var storeTanks = TankHelper.MakeTankGroup(tanks, __instance.OwnerId, player.Identity.IdentityId, gas);
+            var playerTanks = TankHelper.MakeTankGroup(tanks, player.Identity.IdentityId, __instance.OwnerId, gas);
 
             float totalGas = storeTanks.GasInTanks;
-            var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = "Hydrogen" };
             float playerCapacity = playerTanks.Capacity;
             //  Sandbox.Engine.Multiplayer.MyMultiplayer.RaiseEvent<MyStoreBlock, MyStoreSellItemResult>(this, (Func<MyStoreBlock, Action<MyStoreSellItemResult>>)(x => new Action<MyStoreSellItemResult>(x.OnSellItemResult)), storeSellItemResult, MyEventContext.Current.Sender);
             if (storeTanks.GasInTanks == 0)
             {
-                var m1 = new DialogMessage("Shop Error", "Tanks have no gas to sell!");
+                var m1 = new DialogMessage("Shop Error", $"Tanks have no {gas} to sell!");
                 ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                 return false;
             }
      
             if (__instance.OwnerId == player.Identity.IdentityId)
             {
-                var m1 = new DialogMessage("Shop Error", "You cannot buy hydrogen from yourself!");
+                var m1 = new DialogMessage("Shop Error", $"You cannot buy {gas} from yourself!");
                 ModCommunication.SendMessageTo(m1, player.Id.SteamId);
                 return false;
             }
