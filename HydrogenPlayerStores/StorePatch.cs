@@ -57,6 +57,12 @@ namespace HydrogenPlayerStores
             {
                 return true;
             }
+            if (storeItem == null)
+            {
+
+                return true;
+            }
+       
             var isItem = false;
 
             if (storeItem.Item.Value.SubtypeName.Contains("HydrogenCredit") || storeItem.Item.Value.SubtypeName.Contains("OxygenCredit") || storeItem.Item.Value.SubtypeName.Contains("PlasmaCredit"))
@@ -130,6 +136,15 @@ namespace HydrogenPlayerStores
 
             var storeItem = __instance.PlayerItems.FirstOrDefault(playerItem => playerItem.Id == id);
             if (storeItem == null)
+            {
+                return true;
+            }
+            if (storeItem.PrefabName == null || !string.IsNullOrWhiteSpace(storeItem.PrefabName) || storeItem.PrefabTotalPcu > 0 || storeItem.PrefabTotalPcu == null)
+            {
+                return true;
+            }
+
+            if (storeItem.IsCustomStoreItem)
             {
                 return true;
             }
