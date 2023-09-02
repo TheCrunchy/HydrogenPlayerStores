@@ -139,10 +139,6 @@ namespace HydrogenPlayerStores
             {
                 return true;
             }
-            if (storeItem.PrefabName == null || !string.IsNullOrWhiteSpace(storeItem.PrefabName) || storeItem.PrefabTotalPcu > 0 || storeItem.PrefabTotalPcu == null)
-            {
-                return true;
-            }
 
             if (storeItem.IsCustomStoreItem)
             {
