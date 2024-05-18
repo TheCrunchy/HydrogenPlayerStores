@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HydrogenPlayerStores.Models;
-using NLog.Fluent;
 using Sandbox.Game.Entities.Blocks;
 using Sandbox.ModAPI;
 using VRage.Game;
@@ -69,7 +65,7 @@ namespace HydrogenPlayerStores.Helper
             var group = new TankGroup();
             try
             {
-               
+
                 var gas = new VRage.Game.ObjectBuilders.Definitions.MyObjectBuilder_GasProperties { SubtypeName = gasType };
                 var gasId = MyDefinitionId.FromContent(gas);
                 if (gasId == null)
@@ -92,9 +88,10 @@ namespace HydrogenPlayerStores.Helper
                     {
                         continue;
                     }
-                    group.TanksInGroup.Add(tank);
+
                     var tankk = tank as MyGasTank;
                     if (tankk.BlockDefinition.StoredGasId != gasId) continue;
+                    group.TanksInGroup.Add(tank);
                     if (tankk.FilledRatio > 0)
                     {
                         group.GasInTanks += (float)(tankk.FilledRatio) * tankk.GasCapacity;
